@@ -144,6 +144,12 @@ define(['modules/backbone-mozu', "modules/api", 'hyprlive', 'hyprlivecontext', '
 
     var OrderHistoryView = Backbone.MozuView.extend({
         templateName: "modules/my-account/order-history-list",
+        initialize: function() {
+            var self = this;
+            this.listenTo(this.model, 'ordersLoaded', function(id) {
+                self.render();
+            });
+        },
         getRenderContext: function() {
             var context = Backbone.MozuView.prototype.getRenderContext.apply(this, arguments);
             context.returning = this.returning;
@@ -425,19 +431,13 @@ define(['modules/backbone-mozu', "modules/api", 'hyprlive', 'hyprlivecontext', '
 
             var _totalRequestCompleted = 0;
 
-            _.each(returnObj.get('packages'), function(value, key, list) {
-                window.accountModel.apiGetReturnLabel({
-                    'returnId': returnId,
-                    'packageId': value.id,
-                    'returnAsBase64Png': true
-                }).then(function(data) {
-                    value.labelImageSrc = 'data:image/png;base64,' + data;
-                    _totalRequestCompleted++;
-                    if (_totalRequestCompleted == list.length) {
-                        printReturnLabelView.render();
-                        printReturnLabelView.loadPrintWindow();
-                    }
-                });
+            window.accountModel.apiGetFulfillmentReturnLabel({
+                'returnId': returnId
+            }).then(function(data) {
+                returnObj.set('labelImageSrc', data.imageURL);
+
+                printReturnLabelView.render();
+                printReturnLabelView.loadPrintWindow();
             });
 
         }

@@ -52,24 +52,17 @@ define(["modules/jquery-mozu", 'modules/api', "underscore", "hyprlive", "modules
 
         var _totalRequestCompleted = 0;
 
-        _.each(returnObj.packages, function(value, key, list) {
-            window.accountModel.apiGetReturnLabel({
-                'returnId': returnId,
-                'packageId': value.id,
-                'returnAsBase64Png': true
-            }).then(function(data) {
-                value.labelImageSrc = 'data:image/png;base64,' + data;
-                _totalRequestCompleted++;
-                if (_totalRequestCompleted == list.length) {
-                    var returnModel = new Backbone.MozuModel(returnObj);
-                    var printReturnLabelView = new MyAccount.ReturnPrintLabelView({
-                        el: $('#mz-printReturnLabelView'),
-                        model: returnModel
-                    });
-                    printReturnLabelView.render();
-                    printReturnLabelView.loadPrintWindow();
-                }
+        window.accountModel.apiGetFulfillmentReturnLabel({
+            'returnId': returnId
+        }).then(function(data) {
+            returnObj.set('labelImageSrc', data.imageURL);
+            var returnModel = new Backbone.MozuModel(returnObj);
+            var printReturnLabelView = new MyAccount.ReturnPrintLabelView({
+                el: $('#mz-printReturnLabelView'),
+                model: returnModel
             });
+            printReturnLabelView.render();
+            printReturnLabelView.loadPrintWindow();
         });
 
     },

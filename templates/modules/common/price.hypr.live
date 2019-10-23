@@ -1,4 +1,6 @@
 ﻿ {% if model.onSale %}
+ {% dump "Price" %}
+     {% dump model.price %}
  <span class="mz-price is-crossedout">
      {{model.price|currency}}
  </span>
@@ -19,7 +21,8 @@
  </span>
  {% else %}
  <span itemprop="price" class="mz-price">
-
+        {% dump "Price" %}
+     {% dump model.price %}
      {% if model.priceType != "MAP" %}
          {{model.price|currency}}
      {% else %}
